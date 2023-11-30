@@ -1,0 +1,310 @@
+openapi: "3.0.0"
+info:
+  title: Social network API
+  description: Social network API description
+  version: '1.0'
+  contact: {}
+paths:
+  /v1/friends/invite:
+    post:
+      tags: [friends]
+      operationId: friends.invite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteFriendRequest'
+      responses:
+        201:
+          description: ''
+
+  /v1/friends/delete:
+    post:
+      tags: [friends]
+      operationId: friends.delete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteFriendRequest'
+      responses:
+        200:
+          description: ''
+  
+  /v1/users/{userId}/friends:
+    get:
+      tags: [users]
+      operationId: users.friends
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FriendProfile'
+
+  /v1/users/{userId}/profile:
+    get:
+      tags: [users]
+      operationId: users.profile
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /v1/posts/create:
+    post:
+      tags: [posts]
+      operationId: posts.create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+      responses:
+        201:
+          description: ''
+
+  /v1/posts/{postId}/add-media:
+    post:
+      tags: [posts]
+      operationId: posts.add-media
+      parameters:
+        - name: postId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        200:
+          description: ''
+
+  /v1/feeds/{userId}:
+    get:
+      tags: [feeds]
+      operationId: feeds.user
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeedPost'
+
+  /v1/feeds/my:
+    get:
+      tags: [feeds]
+      operationId: feeds.my
+      parameters:
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeedPost'
+
+  /v1/chats/{userId}:
+    get:
+      tags: [chats]
+      operationId: chats.get
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: lastMessageId
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChatMessage'
+
+  /v1/chats/{userId}/send:
+    post:
+      tags: [chats]
+      operationId: chats.send
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendChatMessageRequest'
+      responses:
+        201:
+          description: ''
+
+components:
+  schemas:
+    InviteFriendRequest:
+      type: object
+      properties:
+        inviteeUserId:
+          type: string
+      required:
+        - inviteeUserId
+
+    DeleteFriendRequest:
+      type: object
+      properties:
+        friendUserId:
+          type: string
+      required:
+        - friendUserId
+
+    FriendProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        avatar_url_small:
+          type: string
+      required:
+        - userId
+        - name
+        - avatar_url_small
+
+    UserProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        avatar_url_small:
+          type: string
+        avatar_url_medium:
+          type: string
+        about:
+          type: string
+      required:
+        - userId
+        - name
+        - avatar_url_small
+        - avatar_url_medium
+        - about
+
+    CreatePostRequest:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    FeedPost:
+      type: object
+      properties:
+        postId:
+          type: string
+        message:
+          type: string
+        datetime:
+          format: date-time
+          type: string
+      required:
+        - postId
+        - message
+        - datetime
+
+    ChatMessage:
+      type: object
+      properties:
+        messageId:
+          type: string
+        fromUserId:
+          type: string
+        toUserId:
+          type: string
+        datetime:
+          format: date-time
+          type: string
+        message:
+          type: string
+      required:
+        - messageId
+        - fromUserId
+        - toUserId
+        - datetime
+        - message
+
+    SendChatMessageRequest:
+      type: object
+      properties:
+        datetime:
+          format: date-time
+          type: string
+        message:
+          type: string
+      required:
+        - datetime
+        - message
